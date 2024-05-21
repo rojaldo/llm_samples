@@ -2,12 +2,14 @@ package org.springframework.ai.openai.samples.helloworld.simple;
 
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.Generation;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,14 +40,18 @@ public class SimpleAiController {
 	}
 
 	@GetMapping("/ai/question")
-	public Map<String, Object> question(@RequestParam(value = "topic", defaultValue = "tell me about shakespeare") String topic) {
+	public Map<String, Object> question(
+		@RequestParam(value = "topic", defaultValue = "tell me about shakespeare") String topic,
+		@RequestParam(value = "words", defaultValue = "10") int words) {
 		String userText = topic;
+		int wordsNumber = words;
 		String systemText = """
 			You are a helpful AI assistant that helps people find information.
-			You should reply to the user's request with just one word
+			You should reply to the user's request with just {wordsNumber} word
 			""";
 		UserMessage userMessage = new UserMessage(userText);
-		SystemMessage systemMessage = new SystemMessage(systemText);
+		SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(systemText);
+		Message systemMessage = systemPromptTemplate.createMessage(Map.of("wordsNumber", wordsNumber));
 
 		Prompt prompt = new Prompt(List.of(userMessage, systemMessage));
 		List<Generation> response = chatClient.call(prompt).getResults();
