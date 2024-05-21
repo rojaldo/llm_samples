@@ -2,11 +2,11 @@ package org.springframework.models;
 
 import java.util.List;
 
-public class ActorsFilms {
+public class Actor {
 
 	public String actor;
 
-	public List<String> movies;
+	public List<Movie> movies;
 
     // getters and toString omitted
 }

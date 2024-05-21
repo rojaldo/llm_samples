@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.models.ActorsFilms;
+import org.springframework.models.Actor;
+import org.springframework.models.Movie;
 
 @RestController
 public class SimpleAiController {
@@ -61,12 +62,12 @@ public class SimpleAiController {
 	}
 
 	@GetMapping("/ai/movies")
-    public ActorsFilms generate(@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
-        var outputParser = new BeanOutputParser<>(ActorsFilms.class);
+    public Actor generate(@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actor) {
+        var outputParser = new BeanOutputParser<>(Actor.class);
 
         String userMessage =
                 """
-                Generate the filmography for the actor {actor}.
+                Generate the filmography for the actor {actor}. Include all the movies until 2022
                 {format}
                 """;
 
@@ -74,8 +75,26 @@ public class SimpleAiController {
         Prompt prompt = promptTemplate.create();
         Generation generation = chatClient.call(prompt).getResult();
 
-        ActorsFilms actorsFilms = outputParser.parse(generation.getOutput().getContent());
+        Actor actorsFilms = outputParser.parse(generation.getOutput().getContent());
         return actorsFilms;
+    }
+
+	@GetMapping("/ai/last_movie")
+    public Movie lastMovie(@RequestParam(value = "actor", defaultValue = "Jeff Bridges") String actorName) {
+        var outputParser = new BeanOutputParser<>(Actor.class);
+
+        String userMessage =
+                """
+                Generate the filmography for the actor {actor}. Include all the movies until 2022. Order the movies by release date. Include those movies that {actor} is not the main actor in.
+                {format}
+                """;
+
+        PromptTemplate promptTemplate = new PromptTemplate(userMessage, Map.of("actor", actorName, "format", outputParser.getFormat() ));
+        Prompt prompt = promptTemplate.create();
+        Generation generation = chatClient.call(prompt).getResult();
+
+        Actor actor = outputParser.parse(generation.getOutput().getContent());
+        return actor.movies.get(actor.movies.size() - 1);
     }
 }
 
