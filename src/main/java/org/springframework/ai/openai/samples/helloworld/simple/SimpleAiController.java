@@ -96,6 +96,32 @@ public class SimpleAiController {
         Actor actor = outputParser.parse(generation.getOutput().getContent());
         return actor.movies.get(actor.movies.size() - 1);
     }
+
+	@GetMapping("/ai/next_movie")
+	public Object nextMovie(@RequestParam(value = "movie", defaultValue = "Pulp Fiction") String movieName) {
+		var outputParser = new BeanOutputParser<>(List.class);
+
+		String userMessage =
+				"""
+				Give me an array with the actors that are going to be in the next movie of {movieName}
+				""";
+
+		PromptTemplate promptTemplate = new PromptTemplate(userMessage, Map.of("movieName", movieName, "format", outputParser.getFormat() ));
+		Prompt prompt = promptTemplate.create();
+		Generation generation = chatClient.call(prompt).getResult();
+
+		List actors = outputParser.parse(generation.getOutput().getContent());
+
+		String secondMessage =
+				"""
+				give me a json array of only the next movie that appeared each actor from {actors} after {movieName}. With the format: actor_name, movie_name, year
+				""";
+		promptTemplate = new PromptTemplate(secondMessage, Map.of("actors", actors, "movieName", movieName, "format", outputParser.getFormat() ));
+		prompt = promptTemplate.create();
+		generation = chatClient.call(prompt).getResult();
+		List movies = outputParser.parse(generation.getOutput().getContent());
+		return movies;
+	}
 }
 
 
