@@ -9,18 +9,21 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.parser.BeanOutputParser;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.models.Actor;
 import org.springframework.models.Movie;
 
-@RestController
+// @RestController
 public class SimpleAiController {
 
 	private final ChatClient chatClient;
@@ -114,7 +117,7 @@ public class SimpleAiController {
 
 		String secondMessage =
 				"""
-				give me a json array of only the next movie that appeared each actor from {actors} after {movieName}. With the format: actor_name, movie_name, year
+				give me a json array of only the next movie that appeared each actor from {actors} after {movieName}. If there is not next movie, say no next movie. With the format: actor_name, movie_name, year
 				""";
 		promptTemplate = new PromptTemplate(secondMessage, Map.of("actors", actors, "movieName", movieName, "format", outputParser.getFormat() ));
 		prompt = promptTemplate.create();
@@ -122,6 +125,22 @@ public class SimpleAiController {
 		List movies = outputParser.parse(generation.getOutput().getContent());
 		return movies;
 	}
+
+	@GetMapping("/ai/weather")
+	public Object weather(@RequestParam(value = "city", defaultValue = "New York") String city) {
+		return new MockWeatherService().apply(new MockWeatherService.Request(city, MockWeatherService.Unit.C));
+	}
+
+	@Configuration
+	static class Config {
+
+		@Bean
+		@Description("Get the weather in location") // function description
+			public Function<MockWeatherService.Request, MockWeatherService.Response> weatherFunction1() {
+			return new MockWeatherService();
+		}
+
+}
 }
 
 
