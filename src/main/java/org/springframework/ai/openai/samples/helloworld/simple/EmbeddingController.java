@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.ai.embedding.EmbeddingClient;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jms.artemis.ArtemisProperties.Embedded;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ public class EmbeddingController {
     private final EmbeddingClient embeddingClient;
 
     @Autowired
+    
     public EmbeddingController(EmbeddingClient embeddingClient) {
         this.embeddingClient = embeddingClient;
     }

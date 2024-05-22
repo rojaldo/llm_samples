@@ -43,6 +43,27 @@ public class OllamaChatController {
         return Map.of("embedding", embeddingResponse);
     }
 
+    @GetMapping("/ai/ollama/embedding/compare")
+    public Map compare(@RequestParam(value = "m1", defaultValue = "dog") String message1,
+                       @RequestParam(value = "m2", defaultValue = "cat") String message2) {
+        List<Double> embedding1 = embeddingClient.embed(message1);
+        List<Double> embedding2 = embeddingClient.embed(message2);
+        double similarity = cosineSimilarity(embedding1, embedding2);
+        return Map.of("similarity", similarity);
+    }
+
+    double cosineSimilarity(List<Double> embedding1, List<Double> embedding2) {
+        double dotProduct = 0.0;
+        double norm1 = 0.0;
+        double norm2 = 0.0;
+        for (int i = 0; i < embedding1.size(); i++) {
+            dotProduct += embedding1.get(i) * embedding2.get(i);
+            norm1 += Math.pow(embedding1.get(i), 2);
+            norm2 += Math.pow(embedding2.get(i), 2);
+        }
+        return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+    }
+
     // @GetMapping("/ai/generateStream")
 	// public Object generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
     //     Prompt prompt = new Prompt(new UserMessage(message));
