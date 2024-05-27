@@ -25,7 +25,8 @@ public class TrivialController {
         You are a helpful AI assistant, that only answers in just JSON format. 
         You make cards for a quiz game. 
         These cards have a question and 4 possible answers. 
-        The answer should be always in json format as this: { \"question\": \"question\", \"correct_answer\": \"correct answer\", \"incorrect_answers\": [\"incorrect answer 1\", \"incorrect answer 2\", \"incorrect answer 3\"] } 
+        The answer should be always in json format as this: { \"question\": \"question\", \"language\":<the language used in the card> \"correct_answer\": \"correct answer\", \"incorrect_answers\": [\"incorrect answer 1\", \"incorrect answer 2\", \"incorrect answer 3\"] } 
+        The code for the field language should be the language code, for example, for English is "en", for Spanish is "es", etc.
         In case that there are several cards, return them as an array of json objects.
     """;
 
@@ -48,9 +49,9 @@ public class TrivialController {
                         .withContent(ROLE_SYSTEM)
                         .build(),
                     Message.builder(Role.USER)
-                        .withContent(topic)
+                        .withContent(topic + " in " + lang + " language")
                         .build()))
-            .withOptions(OllamaOptions.create().withTemperature(0.9f))
+            .withOptions(OllamaOptions.create().withTemperature(0.5f))
             .build();
         return Map.of("generation", oapi.chat(request).message().content());
     }

@@ -7,6 +7,10 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.openai.OpenAiImageClient;
+import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.parser.BeanOutputParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +35,7 @@ public class SimpleAiController {
 	@Autowired
 	public SimpleAiController(ChatClient chatClient) {
 		this.chatClient = chatClient;
+
 	}
 
 	@GetMapping("/ai/simple")
@@ -130,6 +135,7 @@ public class SimpleAiController {
 	public Object weather(@RequestParam(value = "city", defaultValue = "New York") String city) {
 		return new MockWeatherService().apply(new MockWeatherService.Request(city, MockWeatherService.Unit.C));
 	}
+
 
 	@Configuration
 	static class Config {
