@@ -23,7 +23,7 @@ import java.util.function.Function;
 import org.springframework.models.Actor;
 import org.springframework.models.Movie;
 
-// @RestController
+@RestController
 public class SimpleAiController {
 
 	private final ChatClient chatClient;

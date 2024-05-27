@@ -24,8 +24,6 @@ public class OllamaChatController {
     private final EmbeddingClient embeddingClient;
     private final VectorStore vectorStore;
 
-
-
     @Autowired
     public OllamaChatController(OllamaChatClient chatClient, EmbeddingClient embeddingClient, VectorStore vectorStore) {
         this.ollamaChatClient = chatClient;
